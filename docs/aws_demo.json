@@ -1,0 +1,57 @@
+{
+    "s3": [
+        {
+            "name": "example-public-bucket",
+            "acl": "public-read",
+            "policy_allows_public": true
+        },
+        {
+            "name": "legacy-static-site",
+            "acl": "public-read",
+            "website": true
+        },
+        {
+            "name": "private-artifacts",
+            "acl": "private"
+        }
+    ],
+    "ec2": [
+        {
+            "id": "i-01"
+        },
+        {
+            "id": "i-02"
+        },
+        {
+            "id": "i-03"
+        }
+    ],
+    "iam": [
+        {
+            "role": "PowerUserRole"
+        },
+        {
+            "role": "ReadOnlyRole"
+        }
+    ],
+    "security_groups": [
+        {
+            "id": "sg-02ab...",
+            "ingress": [
+                {
+                    "cidr": "0.0.0.0/0",
+                    "port": 22
+                }
+            ]
+        },
+        {
+            "id": "sg-0bad...",
+            "ingress": [
+                {
+                    "cidr": "0.0.0.0/0",
+                    "port": 3389
+                }
+            ]
+        }
+    ]
+}

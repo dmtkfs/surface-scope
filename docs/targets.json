@@ -1,0 +1,20 @@
+[
+    {
+        "host": "api.example.com"
+    },
+    {
+        "host": "staging.example.com"
+    },
+    {
+        "host": "rdp.example.com"
+    },
+    {
+        "host": "smb.example.com"
+    },
+    {
+        "host": "vpn.example.com"
+    },
+    {
+        "host": "old-backup.example.com"
+    }
+]

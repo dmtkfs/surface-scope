@@ -1,0 +1,38 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.build/
+dist/
+.venv/
+venv/
+.env
+.env.*
+
+
+# ---- SurfaceScope generated reports ----
+/surface-scope-reports/*
+!/surface-scope-reports/.gitkeep
+
+
+# ---- Logs / scratch ----
+*.log
+*.tmp
+*.bak
+
+
+# ---- Editors / OS ----
+.vscode/
+.idea/
+*.code-workspace
+.DS_Store
+Thumbs.db
+
+
+# ---- Coverage / test artifacts ----
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
