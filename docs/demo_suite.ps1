@@ -1,13 +1,28 @@
-# docs/demo_suite.ps1 — build demo inputs and run showcase commands
+# docs/demo_suite.ps1 — build demo inputs and run showcase commands (robust)
+# Requires: PowerShell 7+ (pwsh) recommended
+
 $ErrorActionPreference = "Stop"
 
-$root = Get-Location
-$docs = Join-Path -Path $root -ChildPath "docs"
-$reports = Join-Path -Path $root -ChildPath "surface-scope-reports"
+function Run-Or-Die {
+  param(
+    [Parameter(Mandatory=$true)][string]$Cmd,
+    [string]$Desc = ""
+  )
+  Write-Host "`n>>> $Cmd" -ForegroundColor Cyan
+  & pwsh -NoLogo -NoProfile -Command $Cmd
+  if ($LASTEXITCODE -ne 0) {
+    throw "Command failed ($LASTEXITCODE): $Desc`n  $Cmd"
+  }
+}
 
+# Ensure folders
+$root = Get-Location
+$docs = Join-Path $root "docs"
+$reports = Join-Path $root "surface-scope-reports"
 New-Item -ItemType Directory -Force -Path $docs | Out-Null
 New-Item -ItemType Directory -Force -Path $reports | Out-Null
 
+# --- Demo input files (idempotent) ---
 # targets.json
 @'
 [
@@ -45,26 +60,22 @@ New-Item -ItemType Directory -Force -Path $reports | Out-Null
 }
 '@ | Set-Content -NoNewline -Path (Join-Path $docs "policy.json") -Encoding utf8
 
-# 1) Demo with custom policy JSON (label becomes custom(policy.json))
-$demoJson = Join-Path $reports "demo-paranoid.json"
-$demoHtml = Join-Path $reports "demo-paranoid.html"
-python surface_scope.py run --demo -d acme.corp --policy balanced --policy-json (Join-Path $docs "policy.json") --demo-seed 1337 --json-out $demoJson --html-out $demoHtml
-if (!(Test-Path $demoJson)) { throw "Missing $demoJson" }
-if (!(Test-Path $demoHtml)) { throw "Missing $demoHtml" }
 
-# 2) Quiet demo (HTML only, suppressed body but prints confirmation)
-$scanHtml = Join-Path $reports "demo-scan.html"
-python surface_scope.py scan --demo --html-out $scanHtml --quiet
-if (!(Test-Path $scanHtml)) { throw "Missing $scanHtml" }
+# --- Showcase commands (each checked for nonzero exit code) ---
 
-# 3) Real-ish run with offline inputs
-$runHtml = Join-Path $reports "run.html"
-$runJson = Join-Path $reports "run.json"
-python surface_scope.py run --targets (Join-Path $docs "targets.json") --cloud-json (Join-Path $docs "aws_demo.json") --html-out $runHtml --json-out $runJson --timeout 1.5
-if (!(Test-Path $runHtml)) { throw "Missing $runHtml" }
-if (!(Test-Path $runJson)) { throw "Missing $runJson" }
+# 1) Demo run with paranoid policy + JSON/HTML artifacts
+Run-Or-Die -Cmd 'python surface_scope.py run --demo -d acme.corp --policy paranoid --demo-seed 1337 --json-out surface-scope-reports/demo-paranoid.json --html-out surface-scope-reports/demo-paranoid.html' -Desc 'demo-paranoid run'
 
-# 4) Dry-run showcase (prints DRY-RUN line and writes nothing)
-python surface_scope.py run --demo --json-out (Join-Path $reports "dry.json") --html-out (Join-Path $reports "dry.html") --no-write
+# 2) scan alias (demo) producing HTML
+Run-Or-Die -Cmd 'python surface_scope.py scan --demo --html-out surface-scope-reports/demo-scan.html' -Desc 'scan alias demo'
+
+# 3) Real-mode run from local inputs (no discovery), JSON+HTML
+Run-Or-Die -Cmd 'python surface_scope.py run --targets docs\targets.json --cloud-json docs\aws_demo.json --html-out surface-scope-reports/run.html --json-out surface-scope-reports/run.json --timeout 1.5' -Desc 'run with targets+cloud json'
+
+# 4) Quiet mode (should print only short status line)
+Run-Or-Die -Cmd 'python surface_scope.py run --demo --html-out surface-scope-reports\quiet.html --quiet' -Desc 'quiet run demo'
+
+# 5) Dry run (no files must be written)
+Run-Or-Die -Cmd 'python surface_scope.py run --demo --json-out surface-scope-reports\dry.json --html-out surface-scope-reports\dry.html --no-write' -Desc 'dry-run demo'
 
 Write-Host "`nDemo suite completed successfully." -ForegroundColor Green

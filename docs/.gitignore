@@ -1,38 +1,36 @@
-# ---- Python ----
+# Python
 __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
+*.so
 *.egg-info/
-.build/
-dist/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+ruff_cache/
+
+# Envs
+.env
 .venv/
 venv/
-.env
-.env.*
+env/
 
-
-# ---- SurfaceScope generated reports ----
-/surface-scope-reports/*
-!/surface-scope-reports/.gitkeep
-
-
-# ---- Logs / scratch ----
-*.log
-*.tmp
-*.bak
-
-
-# ---- Editors / OS ----
-.vscode/
-.idea/
-*.code-workspace
+# OS/editor
 .DS_Store
 Thumbs.db
+.idea/
+.vscode/
+*.swp
 
+# Local reports & artifacts
+surface-scope-reports/
 
-# ---- Coverage / test artifacts ----
-.pytest_cache/
+# Logs
+*.log
+
+# Coverage / build
 .coverage
 htmlcov/
-.tox/
+build/
+dist/
